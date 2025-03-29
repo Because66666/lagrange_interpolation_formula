@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lagrange插值</title>
+    <link rel="stylesheet" href="../static/style_v2.css">
+    <link rel="stylesheet" href="../static/notyf.css">
+    <script id="MathJax-script" async src="../static/latex.js"></script>
+
+    <style>
+        /* 确保所有容器都有足够的内边距 */
+        .content-padding {
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            /* 对于小屏幕，将两列布局转换为单列布局 */
+            .grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* 确保图表和其他重要元素有足够的空间 */
+            #myChart {
+                height: auto !important;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8" data-id="1">
+    <div class="max-w-7xl mx-auto content-padding" data-id="2">
+        <h1 class="text-3xl font-bold text-center mb-2" data-id="3">
+        拉格朗日插值</h1>
+        <h2 class="text-xl text-gray-600 text-left mb-8" data-id="4">作者：Because66666,Duke</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8" data-id="5">
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6" data-id="6">
+                <div class="mb-4 flex items-center" data-id="7">
+                    <div class="w-1/3 text-center font-medium" data-id="8">X 轴</div>
+                    <div class="w-1/3 text-center font-medium" data-id="9">Y 轴</div>
+                    <div class="w-1/3" data-id="10"></div>
+                </div>
+                <div class="space-y-4" data-id="11">
+                    <div class="container_element" data-id="11_2">
+                        <div class="flex items-center space-x-2" data-id="12">
+                            <input
+                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                    placeholder="X 值" data-id="13" type="text" value="0">
+                            <input
+                                    class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                    placeholder="Y 值" data-id="14" type="text" value="1">
+                            <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3 w-1/3"
+                                    data-id="15">删除
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2" data-id="12"><input
+                                class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                placeholder="X 值" data-id="13" type="text" value="1"><input
+                                class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                placeholder="Y 值" data-id="14" type="text" value="2">
+                            <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3 w-1/3"
+                                    data-id="15">删除
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2" data-id="12"><input
+                                class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                placeholder="X 值" data-id="13" type="text" value="2"><input
+                                class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-1/3"
+                                placeholder="Y 值" data-id="14" type="text" value="4">
+                            <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3 w-1/3"
+                                    data-id="15">删除
+                            </button>
+                        </div>
+                    </div>
+                    <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2 w-full"
+                            data-id="16">添加新的点
+                    </button>
+                    <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-2 w-full"
+                            data-id="18">运算
+                    </button>
+                    <div class="mt-6" data-id="17"><h3 class="text-lg font-medium text-gray-900" data-id="18_2">
+                        拉格朗日插值多项式：</h3>
+                        <p data-id="19" style="overflow: auto;" ></p></div>
+                </div>
+            </div>
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg p-6" data-id="16">
+                <div data-id="17" style="height: 400px;">
+                    <canvas id="myChart" style="width: 100%; height: 100%;">
+
+                    </canvas>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/chart.js"></script>
+<script src="../static/math.js"></script>
+<script src="../static/notyf.js"></script>
+<!-- <script src="../static/algebra.js"></script> -->
+<script src="../static/paint.js"></script>
+<script src="../static/button.js"></script>
+
+</body>
+</html> 

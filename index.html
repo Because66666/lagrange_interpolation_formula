@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数值分析程序作业</title>
+    <link rel="stylesheet" href="static/style_v2.css">
+    <style>
+        /* 确保所有容器都有足够的内边距 */
+        .content-padding {
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            /* 对于小屏幕，将两列布局转换为单列布局 */
+            .grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* 确保图表和其他重要元素有足够的空间 */
+            #myChart {
+                height: auto !important;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="flex justify-center items-center min-h-screen bg-background p-4">
+    <div class="w-full max-w-sm">
+        <h1 class="text-2xl font-bold text-center mb-6">数值分析程序作业</h1>
+        <h3 class="text-xl font-bold text-center mb-6">作者：Because66666,Duke</h3>
+        <div class="flex flex-col gap-4">
+            <button
+                    id="lagrange-interpolation-btn"
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8 text-lg font-bold"
+            >
+                lagrange插值计算
+            </button>
+            <button
+                    id="linear-equation-solver-btn"
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 rounded-md px-8 text-lg font-bold"
+            >
+                线性方程求解
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    document.getElementById('lagrange-interpolation-btn').addEventListener('click', function() {
+        window.location.href = 'templates/lag.html';
+    });
+
+    document.getElementById('linear-equation-solver-btn').addEventListener('click', function() {
+        window.location.href = 'templates/linear.html';
+    });
+</script>
+</html> 

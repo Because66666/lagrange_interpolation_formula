@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>lagrange插值</title>
+    <link rel="stylesheet" href="../static/style_v2.css">
+    <link rel="stylesheet" href="../static/notyf.css">
+    <script id="MathJax-script" async src="../static/latex.js"></script>
+    <script src="../static/notyf.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.0.0/math.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.0.0/math.min.js"></script>-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* 确保所有容器都有足够的内边距 */
+        .content-padding {
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            /* 对于小屏幕，将两列布局转换为单列布局 */
+            .grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* 确保图表和其他重要元素有足够的空间 */
+            #myChart {
+                height: auto !important;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="min-h-screen p-8 bg-gradient-to-b from-gray-100 to-gray-200">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-2">线性方程计算</h1>
+        <p class="text-center text-gray-600 mb-8">作者：Because66666,Duke</p>
+        <div class="flex flex-col md:flex-row gap-8 content-padding">
+            <div class="flex-1 bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">输入方阵</h2>
+                <div class="mb-4"><label
+                        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        for="matrix-size">方阵大小：</label><input
+                        class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-20"
+                        id="matrix-size" min="1" max="10" type="number" value="3"></div>
+                <div id="11" class="grid gap-2">
+                </div>
+                <h3 class="text-xl font-semibold mb-2">参数</h3>
+                <div id="12"></div>
+            </div>
+
+            <div class="flex-1 bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">线程方程展示</h2>
+                <div class="border-2 border-gray-300 p-4 rounded-lg" id="equation-display">
+                </div>
+                <h2 class="text-2xl font-semibold mb-4">求解结果</h2>
+                <div class="result" id="13"></div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    // 以分数形式处理矩阵运算
+function gauss_elimination(matrix, nonHomogeneous) {
+    let twoDArray = math.resize(nonHomogeneous,[nonHomogeneous.size()[0],1]);
+    // 构建增广矩阵
+    let augmentedMatrix = math.concat(matrix, twoDArray, 1);
+    // 将矩阵中的每个元素转换为分数
+    let matrixFraction = math.map(augmentedMatrix, (value) => {
+      return math.fraction(value);
+    });
+// 执行高斯消去法
+for (let i = 0; i < matrixFraction.size()[0]-1; i++) {
+    // 获取主元元素
+    let one = math.subset(matrixFraction, math.index(i, i));
+    if (math.equal(one,0)) {continue}
+    for (let j = i+1; j < matrixFraction.size()[0]; j++) {
+        // 获取主元列下一个元素
+        let two = math.subset(matrixFraction, math.index(j, i));
+        // 计算主元列下一个元素与主元的比值
+        let frac = math.divide(two, one);
+        // 获取主元所在的行
+        let one_row = math.subset(matrixFraction, math.index(i, math.range(0, matrixFraction.size()[1])));
+        // 计算主元所在行与比值的乘积
+        let one_row_mul = math.multiply(frac, one_row);
+        // 获取主元列下一个元素所在的行
+        let sec_row = math.subset(matrixFraction, math.index(j, math.range(0, matrixFraction.size()[1])));
+        // 计算新的第二行
+        let sec_row_new = math.subtract(sec_row, one_row_mul);
+        // 替换第二行
+        matrixFraction = matrixFraction.subset(math.index(j, math.range(0, matrixFraction.size()[1])),
+         sec_row_new);
+    }
+    }
+let matrixFraction1 = math.clone(matrixFraction);
+for (let i = matrixFraction.size()[0]-1; i >0 ; i--) {
+    // 获取主元元素
+    let one = math.subset(matrixFraction, math.index(i, i));
+    if (math.equal(one,0)) {continue}
+    for (let j = i-1; j >=0; j--) {
+        // 获取主元列下一个元素
+        let two = math.subset(matrixFraction, math.index(j, i));
+        // 计算主元列下一个元素与主元的比值
+        let frac = math.divide(two, one);
+        // 获取主元所在的行
+        let one_row = math.subset(matrixFraction, math.index(i, math.range(0, matrixFraction.size()[1])));
+        // 计算主元所在行与比值的乘积
+        let one_row_mul = math.multiply(frac, one_row);
+        // 获取主元列下一个元素所在的行
+        let sec_row = math.subset(matrixFraction, math.index(j, math.range(0, matrixFraction.size()[1])));
+        // 计算新的第二行
+        let sec_row_new = math.subtract(sec_row, one_row_mul);
+        // 替换第二行
+        matrixFraction = matrixFraction.subset(math.index(j, math.range(0, matrixFraction.size()[1])),
+         sec_row_new);
+    }
+
+    }
+
+let matrixFraction2 = math.clone(matrixFraction);
+let a2 = [];
+for (let i = 0; i < matrixFraction.size()[0]; i++) {
+    // 获取主元元素
+    let one = math.subset(matrixFraction, math.index(i, i));
+    //乘积
+    let frac = math.divide(1, one);
+    a2.push(frac);
+}
+    let size = matrixFraction.size();
+    let lastColumn = matrixFraction.subset(math.index(math.range(0, size[0]), size[1] - 1));
+    let lc2 = [];
+for (let i = 0; i < lastColumn.size()[0]; i++) {
+    m = math.multiply(a2[i], lastColumn.toArray()[i][0]);
+    lc2.push(m);
+}
+    return [lc2,matrixFraction2,matrixFraction1]
+<!--    lastColumn.toArray().toString()-->
+<!--'3,6,9'-->
+}
+
+
+</script>
+<script>
+    // Helper function to convert a number or fraction to LaTeX format
+    function toLatex(num) {
+            if (math.isFraction(num)) {
+                if (num.d===1||num.d===1n){
+                return num.n.toString();
+                }
+                return `\\frac{${num.n}}{${num.d}}`;
+            } else {
+                return num.toString(); // 如果不是分数，则直接返回数字的字符串表示
+            }
+        }
+</script>
+<script>
+    //处理矩阵的计算
+
+
+
+
+    function calculate_matrix(m,nonHomogeneous){
+    //先计算矩阵的行列式
+    const m2 = math.matrix(m);
+    // 计算行列式
+    const determinant = math.det(m2);
+    if (determinant === 0) {
+    result=`系数矩阵的行列式等于0，方程组的解不唯一。`
+    return result
+    } else {
+    const A = math.matrix(m);
+    const b = math.matrix(nonHomogeneous);
+
+    // 使用 lusolve 求解线性方程组 Ax = b
+    let xx = math.lusolve(A, b);
+    let x2 = xx.toArray();
+    let latexB = '\\begin{bmatrix}\n';
+    latexB += x2.join(' \\\\\n') + '\n\\end{bmatrix}';
+
+    // 使用分数Gauss消元法求解计算
+    let [lastColumn,matrixFraction2,matrixFraction1] = gauss_elimination(A,b);
+
+
+    function make_latex(matrixFraction1){
+        // 获取增广矩阵的行数和列数
+        let size = matrixFraction1.size();
+        // 创建系数矩阵，它包含增广矩阵的所有行，但只有除了最后一列之外的所有列
+        let A = matrixFraction1.subset(math.index(math.range(0, size[0]), math.range(0, size[1] - 1))).toArray();
+        // 创建常数列向量，它包含增广矩阵的所有行，但只有最后一列
+        let b = matrixFraction1.subset(math.index(math.range(0, size[0]), size[1] - 1)).toArray();
+
+
+
+
+        // Construct the LaTeX string for the matrix A
+        let latexA = '\\begin{bmatrix}\n';
+        for (let i = 0; i < A.length; i++) {
+            latexA += A[i].map(toLatex).join(' & ') + '\\\\\n';
+        }
+        latexA += '\\end{bmatrix}';
+
+        // Construct the LaTeX string for the vector b
+        let latexB = '\\begin{bmatrix}\n';
+        for (let i = 0; i < A.length; i++) {
+            latexB += b[i].map(toLatex).join(' & ') + '\\\\\n';
+        }
+        latexB += '\\end{bmatrix}';
+
+        // Construct the LaTeX string for the equation
+        let latexEquation = `$$${latexA} \\cdot \\vec{x} = ${latexB}$$`;
+        return latexEquation;
+    }
+    // Construct the LaTeX string for the vector lastColumn
+    let latexB2 = '\\begin{bmatrix}\n';
+    latexB2 += lastColumn.map(toLatex).join(' \\\\\n') + '\n\\end{bmatrix}';
+
+    result = `经过使用lusolve方法求解线性方程组，得到解为：\n${latexB}\n
+    经过Gauss消去法求解线性方程组，过程为：\n${make_latex(matrixFraction1)}
+    \n${make_latex(matrixFraction2)}
+    \n$$ \\vec{x} = ${latexB2} $$`;
+    return result
+    }
+    }
+
+</script>
+<script>
+    //处理矩阵输出展示
+    const equationDisplay = document.getElementById('equation-display');
+    function get_matrix(){
+        // 获取所有的 <input> 元素
+        const gridContainer = document.getElementById('11');
+        const inputElements = gridContainer.querySelectorAll('input[type="number"]');
+        const matrix_size = parseInt(document.getElementById('matrix-size').value,10);
+        // 创建矩阵
+        let matrixInputs = [];
+        for (let i = 0; i < matrix_size; i++) {
+            matrixInputs[i] = []; // 初始化每一行
+        }
+
+        // 遍历所有的 <input> 元素
+        inputElements.forEach((input, index) => {
+            // 计算当前元素在矩阵中的位置
+            const rowIndex = Math.floor(index / matrix_size); // 行索引
+            const colIndex = index % matrix_size;             // 列索引
+
+            // 将输入框的值转换为浮点数并放入矩阵中，如果为空则用0代替
+            matrixInputs[rowIndex][colIndex] = parseFloat(input.value) || 0;
+        });
+        return matrixInputs;
+    }
+
+    function get_nonHomogeneous(){
+        // 获取所有的 <input> 元素
+        const gridContainer = document.getElementById('12');
+        const inputElements = gridContainer.querySelectorAll('input[type="number"]');
+        const matrix_size = parseInt(document.getElementById('matrix-size').value,10);
+        // 创建一个 4x1 的矩阵
+        let matrixInputs = [];
+
+        // 遍历所有的 <input> 元素
+        inputElements.forEach((input, index) => {
+            // 计算当前元素在矩阵中的位置
+            const colIndex = index % matrix_size;             // 列索引
+
+            // 将输入框的值转换为浮点数并放入矩阵中，如果为空则用0代替
+            matrixInputs[colIndex] = parseFloat(input.value) || 0;
+        });
+        return matrixInputs;
+    }
+
+    function renderMatrixEquation() {
+        let A = get_matrix();
+        let b = get_nonHomogeneous();
+<!--        console.log(A)-->
+<!--        console.log(b)-->
+<!--        console.log(`&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;`)-->
+
+        // Construct the LaTeX string for the matrix A
+        let latexA = '\\begin{bmatrix}\n';
+        for (let i = 0; i < A.length; i++) {
+            latexA += A[i].join(' & ') + '\\\\\n';
+        }
+        latexA += '\\end{bmatrix}';
+
+        // Construct the LaTeX string for the vector b
+        let latexB = '\\begin{bmatrix}\n';
+        latexB += b.join(' \\\\\n') + '\n\\end{bmatrix}';
+
+        // Construct the LaTeX string for the equation
+        let latexEquation = `$$${latexA} \\cdot \\vec{x} = ${latexB}$$`;
+<!--        console.log(latexEquation)-->
+        // Insert LaTeX into the equation display div
+        equationDisplay.innerHTML = latexEquation;
+        result = calculate_matrix(A,b);
+        document.getElementById('13').innerHTML = result;
+        if ('MathJax' in window) {MathJax.typesetPromise();}
+<!--        console.log(`&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;`)-->
+    }
+
+</script>
+<script>
+    //处理矩阵输入
+    function main_init() {
+    const matrixSizeInput = document.getElementById('matrix-size');
+    const matrixContainer = document.querySelector('.grid.gap-2');
+    const nonHomogeneousParamsContainer = document.querySelector('.grid.gap-2'); // Assuming this is the container for the non-homogeneous parameters
+
+    // Initialize the matrix and non-homogeneous parameters with the default size
+    updateMatrixDisplay(parseInt(matrixSizeInput.value, 10));
+
+    // Update the display when the matrix size changes
+    //当矩阵大小发生变化的时候，修改输入矩阵大小和向量参数大小
+    matrixSizeInput.addEventListener('input', function() {
+        const newSize = parseInt(this.value, 10);
+        updateMatrixDisplay(newSize);
+    });
+    //当矩阵大小发生变化的时候，修改输入矩阵大小和向量参数大小，这是执行函数
+    function createMatrixElements(size) {
+        // Clear existing elements
+        matrixContainer.innerHTML = '';
+        nonHomogeneousParamsContainer.innerHTML = '';
+
+        // Create matrix input and display elements
+        let matrixInputs = [];
+        for (let i = 0; i < size; i++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'flex gap-2';
+            const row = [];
+            for (let j = 0; j < size; j++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-16';
+                if (j>=i){ input.value = `${i+j+1}`};
+                row.push(input);
+                rowDiv.appendChild(input);
+                // Add event listener to each input for real-time updates
+                input.addEventListener('input', function() {
+                    renderMatrixEquation();
+                });
+                rowDiv.appendChild(input);
+            }
+            matrixInputs.push(row);
+            matrixContainer.appendChild(rowDiv);
+
+        }
+        // Create non-homogeneous parameter input elements
+        need_input = document.getElementById('12');
+        while (need_input.firstChild) {
+            need_input.removeChild(need_input.firstChild);
+        }//清空全部子元素
+        for (let i = 0; i < size; i++) {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.placeholder = `0`;
+            input.className = 'flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 w-16';
+            input.value=`${i}`;
+            input.addEventListener('input', function() {
+                    renderMatrixEquation();
+                });
+            need_input.appendChild(input);
+        }
+         // Initial render
+        renderMatrixEquation();
+    }
+
+    function updateMatrixDisplay(size) {
+        createMatrixElements(size);
+        // Optionally reset the value of the inputs and spans here if needed
+    }
+};
+    document.addEventListener('DOMContentLoaded', function () {main_init();});
+</script>
+
+</body>
+</html>
